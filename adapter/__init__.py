@@ -54,7 +54,7 @@ def create_app():
         if existEnvFile and deepLynxUrl and containerName and dataSourceName:
             # instantiate deep_lynx_service
             dl_service = deep_lynx.DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
-                                         os.getenv('DATA_SOURCE_NAME'))
+                                                   os.getenv('DATA_SOURCE_NAME'))
             dl_service.init()
         else:
             print('Setup Error: Check logging file MLAdapter.log for more information')
@@ -98,7 +98,6 @@ def create_app():
                         dl_event['modifiedDate'] = datetime.datetime.now().isoformat()
                         dl_event['modifiedUser'] = os.getenv('DATA_SOURCE_NAME')
                         dl_service.create_manual_import(dl_service.container_id, dl_service.data_source_id, dl_event)
-
 
                         return Response(response=json.dumps(dl_event), status=200, mimetype='application/json')
 
