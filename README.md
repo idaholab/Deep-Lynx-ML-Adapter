@@ -48,6 +48,7 @@ jupyter kernelspec list
 8. Start Jupyter Notebook from the root directory of this project. Go to `New` to verify the R kernel was installed
 
 ```
+conda activate <MY-ENV-NAME>
 jupyter notebook
 ```
 

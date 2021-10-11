@@ -6,7 +6,7 @@ import datetime
 from flask import Flask, request, Response, json
 
 import deep_lynx
-#from adapter import ml_adapter
+from adapter import ml_adapter
 from adapter.deep_lynx_query import deep_lynx_query
 from adapter.deep_lynx_import import deep_lynx_import
 

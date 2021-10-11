@@ -1,0 +1,3 @@
+# Ignore json and csv files in this directory
+*.json
+*.csv
