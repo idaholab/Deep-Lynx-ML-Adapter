@@ -13,6 +13,7 @@ To run this code, first copy the `.env_sample` file and rename it to `.env`. Sev
 Logs will be written to a logfile, stored in the root directory of the project. The log filename is set in `ml/__init__.py`.  
 
 ## Getting Started
+### Install Poetry with Anaconda Virtual Environment
 1. Install [Anaconda](https://docs.anaconda.com/anaconda/install/index.html), allows for Python and R virtual environments
 2. Install [Poetry](https://python-poetry.org/), a package manager for dependencies
 3. Configure the Poetry's Virtualenv location
@@ -24,43 +25,56 @@ poetry config settings.virtualenvs.path <CONDA-INSTALL-LOCATION> # e.g. /Users/u
 4. Create and activate virtual env with conda
 
 ```
-conda create -n <MY-ENV-NAME> r-essentials r-base python=3.8
-conda activate <MY-ENV-NAME>
+$ conda create -n <MY-ENV-NAME> r-essentials r-base python=3.8
+$ conda activate <MY-ENV-NAME>
+(<MY-ENV-NAME>)$
 ```
 
 5. Go to your project directory and install from your pyproject.toml
 
 ```
-poetry install
+(<MY-ENV-NAME>)$ poetry install
 ```
-
-6. Install the R kernel in Jupyter Notebook
+### Install R Kernel
+1. Install the R kernel in Jupyter Notebook
 * https://richpauloo.github.io/2018-05-16-Installing-the-R-kernel-in-Jupyter-Lab/
 * https://developers.refinitiv.com/en/article-catalog/article/setup-jupyter-notebook-r
 
 
-7. Verify the `ir` kernel was installed
+2. Verify the `ir` kernel was installed
 
 ```
 jupyter kernelspec list
 ```
 
-8. Start Jupyter Notebook from the root directory of this project. Go to `New` to verify the R kernel was installed
+3. Start Jupyter Notebook from the root directory of this project. Go to `New` to verify the R kernel was installed
 
 ```
-conda activate <MY-ENV-NAME>
-jupyter notebook
+$ conda activate <MY-ENV-NAME>
+(<MY-ENV-NAME>)$ jupyter notebook
 ```
-
-6. Create a poetry shell
-
-```
-poetry shell
-```
-7. Finally, run the project with flask
+### Install R Packages
+1. Open a new terminal and create an R terminal
 
 ```
-flask run
+$ conda activate <MY-ENV-NAME>
+(<MY-ENV-NAME>)$ R
+```  
+2. Install the packages below
+
+```
+# R terminal
+> install.packages('prospectr', dependencies = TRUE)
+> install.packages('reticulate', dependencies = TRUE)
+> install.packages('dotenv', dependencies = TRUE)
+> install.packages('jsonlite', dependencies = TRUE)
+```
+
+### Run Project
+Finally, run the project with flask
+
+```
+(<MY-ENV-NAME>)$ flask run
 ```
 
 This project uses [yapf](https://github.com/google/yapf) for formatting. Please install it and apply formatting before submitting changes (e.g. `yapf --in-place --recursive . --style={column_limit:120}`)
