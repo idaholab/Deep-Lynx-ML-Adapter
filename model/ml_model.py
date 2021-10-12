@@ -11,7 +11,7 @@ class ML_Model():
     Split into predictors/response for the training and testing datasets that are used by the Jupyter Notebook to create a machine learning model
 
         1. Select independent and dependent variables from the training and testing set
-        2. Create the training and testing files e.g. X_train.csv, X_test.csv, y_train.csv, y_test.csv
+        2. Creates .csv files of the predictors/response for the training and testing sets e.g. X_train.csv, X_test.csv, y_train.csv, y_test.csv
         3. Run the customized machine learning Jupyter Notebook
     
     Return
@@ -55,7 +55,7 @@ class ML_Model():
         self.create_training_testing_files(X_train, X_test, y_train, y_test)
 
         # Run the Jupyter Notebook
-        with open(os.getenv("ML_ADAPTER_DATA"), 'r') as fp:
+        with open(os.getenv("ML_ADAPTER_OBJECT_LOCATION"), 'r') as fp:
             data = json.load(fp)
         utils.run_jupyter_notebook(data["MODEL"]["notebook"], data["MODEL"]["kernel"])
 
@@ -85,7 +85,9 @@ class ML_Model():
 
 
 def main():
-    """Main entry point for script"""
+    """
+    Main entry point for script
+    """
 
     independent_variables = []
     dependent_variables = []

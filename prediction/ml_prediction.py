@@ -11,8 +11,9 @@ class ML_Prediction():
     """
     Make a prediction on incoming data using an existing model file
 
-        1. Select independent and dependent variables from the testing set
+        1. Select independent variables from the testing set
         2. Write the test file 
+        3. Run the customized prediction Jupyter Notebook
     """
     def __init__(self, ml_model):
         # Declare variables
@@ -22,10 +23,12 @@ class ML_Prediction():
         self.make_prediction()
 
     def make_prediction(self):
-        """Make a prediction on incoming data using an existing model file"""
+        """
+        Make a prediction on incoming data using an existing model file
+        """
         # Determine test dataset using the independent variables (Features, X, Predictors) from a model
         independent_variables = self.ml_model.independent_variables
-        with open(os.getenv("ML_ADAPTER_DATA"), 'r') as fp:
+        with open(os.getenv("ML_ADAPTER_OBJECT_LOCATION"), 'r') as fp:
             data = json.load(fp)
         dataset = data["DATASET"]
         test_data = pd.read_csv(dataset)
@@ -38,7 +41,9 @@ class ML_Prediction():
         utils.run_jupyter_notebook(data["PREDICTION"]["notebook"], data["PREDICTION"]["kernel"])
 
     def create_test_file(self, test_data):
-        """Creates a test.csv file of the incoming data """
+        """
+        Creates a test.csv file of the incoming data
+        """
         # Validate extension and path existance before creation
         path = 'test.csv'
         utils.validate_extension('.csv', path)
@@ -52,22 +57,15 @@ class ML_Prediction():
 
 
 def main():
-    """Main entry point for script"""
-    name = 'Sensor_to_Sensor:Multi Point 3'
-    data = {
-        'independent_variables': {
-            'Sensor': ['Time (s)', 'Multi Point 1', 'Multi Point 2']
-        },
-        'dependent_variables': {
-            'Sensor': ['Multi Point 3']
-        }
-    }
-    datasets = {'Sensor': 'data/incoming_data.csv'}
-    split_method = 'random'
-    test_size = 0.2
-    ml_model = model.ML_Model(name=name, data=data, datasets=datasets, split_method=split_method, test_size=test_size)
+    """
+    Main entry point for script
+    """
 
-    prediction = ML_Prediction(ml_model)
+    independent_variables = []
+    dependent_variables = []
+
+    ml_model = model.ML_Model(independent_variables=independent_variables, dependent_variables=dependent_variables)
+    ml_prediction = ML_Prediction(ml_model)
 
 
 if __name__ == "__main__":

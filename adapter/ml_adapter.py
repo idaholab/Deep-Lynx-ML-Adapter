@@ -19,19 +19,19 @@ class ML_Adapter():
         self.data = data
         self.models = list()
 
-        self.write_ML_Adapter_data_to_file()
+        self.write_ml_adapter_object_location_to_file()
         self.generate_training_testing_sets(self.data["SPLIT_METHOD"])
         self.variable_selection()
         self.create_models()
 
-    def write_ML_Adapter_data_to_file(self):
+    def write_ml_adapter_object_location_to_file(self):
         """
         Writes the data for the ML_Adapter object to a JSON file
 
         Note: equivalent to a single JSON object in ML_ADAPTER_OBJECTS environment variable located in the .env file
         """
         # Validate path exists
-        file_path = os.path.abspath(os.getenv("ML_ADAPTER_DATA"))
+        file_path = os.path.abspath(os.getenv("ML_ADAPTER_OBJECT_LOCATION"))
         utils.validate_extension('.json', file_path)
         path = os.path.split(file_path)
         utils.validate_paths_exist(path[0])
@@ -92,9 +92,11 @@ class ML_Adapter():
 
 
 def main(event=None, deep_lynx_service=None):
-    """Main entry point for script"""
-    ml_adapter_data = json.loads(os.getenv("ML_ADAPTER_OBJECTS"))
-    for ml_adapter in ml_adapter_data:
+    """
+    Main entry point for script
+    """
+    ml_adapter_objects = json.loads(os.getenv("ML_ADAPTER_OBJECTS"))
+    for ml_adapter in ml_adapter_objects:
         name = list(ml_adapter.keys())[0]
         data = ml_adapter[name]
         ml_adapter = ML_Adapter(name, data)

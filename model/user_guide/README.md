@@ -1,19 +1,35 @@
 # Model
 
+The user will pick the independent and dependent variables for a model in the `Variable Selection` section. Independent and dependent variables are used to instantiate a `ML_Model` object.
+
+The `ML_Model` class performs these tasks:
+
+1. Select independent and dependent variables from the training and testing set
+2. Creates .csv files of the predictors/response for the training and testing sets e.g. X_train.csv, X_test.csv, y_train.csv, y_test.csv
+3. Run the customized machine learning Jupyter Notebook
+
+Note: For unsupervised learning, an empty list of dependent_variables is provided to instantiate the `ML_Model` object, and y_train.csv and y_test.csv are not created.
+
 ### Input Files
 
-The user will pick the independent variables and dependent variables for a model in the Variable Selection section.  
+* data/X_train.csv
+* data/X_test.csv
+* data/y_train.csv
+* data/y_test.csv
 
-```
-data/X_train.csv
-data/X_test.csv
-data/y_train.csv
-data/y_test.csv
 
-# Note: if unsupervised learning, no response/y/labels will be provided
-```
+### Output Files
+
+* json file of results
+* model serialization file (optional)
+* standardization information (optional but may be needed for making a `ML_Prediction` using an existing model serialization file)
 
 ### Standardize data
+
+Most data scientists standardize their data before splitting the data into X_train, X_test, y_train, and y_test. However, the ML Adapter splits the data in X_train, X_test, y_train, and y_test before standardization occurs. Below is an example of the standardization method called mean normalization that standardizes the datasets (X_train, X_test, y_train, and y_test).
+
+Python
+
 ```Python
 import pandas as pd
 
@@ -70,6 +86,8 @@ def standardize_mean_normalization(X_train, X_test, y_train, y_test):
 ```
 
 ### Unstandardize Data
+
+Unstandardization allows users to view the results without normalization in the response/y/label scientific units. Below is an example of unstandardizing the data via mean normalization.
 
 ```Python
 import pandas as pd

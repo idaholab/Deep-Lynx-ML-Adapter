@@ -19,6 +19,8 @@ Each JSON object of a model requires:
 
 The `independent variables` and `dependent variables` are a list of the column names that will be selected from the dataset. A list of column names for the Response/y/Label was chosen to account for future improvements in the machine learning field which could allow predictions of multiple variables.
 
+Note: For unsupervised learning, an empty list for the dependent_variables should be provided to instantiate the `ML_Model` object.
+
 ```JSON
 {
     "independent_variables": [
@@ -35,14 +37,12 @@ The `independent variables` and `dependent variables` are a list of the column n
 
 ## Access to Environment Variables
 
-An environment variable called `ML_ADAPTER_OBJECTS` should be created in the .env file that provides the details for each machine learning adapter (`ML_Adapter`) object. The `ML_ADAPTER_DATA` environment variable specifies a file that contains the data for the current `ML_Adapter` object.
-
-a programmatically created variable called `data`. When the Jupyter Notebook is run from the `ML_Adapter` class, a code cell is programmatically inserted after the first cell of the Jupyter Notebook where the `data` variable is assigned to the in the ML Adapter object dictionary. Below is an example of a cell inserted into the Jupyter Notebook.
+An environment variable called `ML_ADAPTER_OBJECTS` should be created in the .env file that provides the details for each machine learning adapter (`ML_Adapter`) object. The `ML_ADAPTER_OBJECT_LOCATION` environment variable specifies a file that contains the data for the current `ML_Adapter` object. Below is an example of how to access the data for the current `ML_Adapter` object in a Python or R Jupyter Notebook.
 
 Python
 
 ```Python
-with open(os.getenv("ML_ADAPTER_DATA"), 'r') as fp:
+with open(os.getenv("ML_ADAPTER_OBJECT_LOCATION"), 'r') as fp:
     data = json.load(fp)
 ```
 R
@@ -50,7 +50,7 @@ R
 ```r
 library(jsonlite)
 load_dot_env(file = ".env")
-file_path = Sys.getenv("ML_ADAPTER_DATA")
+file_path = Sys.getenv("ML_ADAPTER_OBJECT_LOCATION")
 data = fromJSON(txt=file_path)
 ```
 
