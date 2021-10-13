@@ -10,6 +10,19 @@ The `ML_Model` class performs these tasks:
 
 Note: For unsupervised learning, an empty list of dependent_variables is provided to instantiate the `ML_Model` object, and y_train.csv and y_test.csv are not created.
 
+## Get Started
+The Jupyter Notebook may have these components:
+* Retrieve Data
+* Standardize the data
+* Create model
+* Make a prediction
+* Un-standardize the data
+* Save model to a serialized file (optional)
+* Generate JSON file of results
+
+
+A sample Jupyter Notebook is included called `sample_model.ipynb`.
+
 ### Input Files
 
 * data/X_train.csv
@@ -26,112 +39,31 @@ Note: For unsupervised learning, an empty list of dependent_variables is provide
 
 ### Standardize data
 
-Most data scientists standardize their data before splitting the data into X_train, X_test, y_train, and y_test. However, the ML Adapter splits the data in X_train, X_test, y_train, and y_test before standardization occurs. Below is an example of the standardization method called mean normalization that standardizes the datasets (X_train, X_test, y_train, and y_test).
+Most data scientists standardize their data before splitting the data into X_train, X_test, y_train, and y_test. However, the ML Adapter splits the data in X_train, X_test, y_train, and y_test before standardization occurs. The README provides an example of the standardization method called mean normalization that standardizes the datasets (X_train, X_test, y_train, and y_test) in Python.
 
-Python
-
-```Python
-import pandas as pd
-
-def standardize_mean_normalization(X_train, X_test, y_train, y_test):
-    """
-    Standardizes the data according to the z-score formula
-
-    z = (x – μ) / σ
-
-    Note: Only the training mean and standard deviation are used for the standardization of the data.
-    This ensures that there is no contamination of the test data set.
-
-    Args
-        X_train (DataFrame): a subset of the Features, X, Predictors dataset used for training
-        X_test (DataFrame): a subset of the Features, X, Predictors dataset used for testing
-        y_train (Series): a subset of the Response, y, Label dataset used for training
-        y_test (Series): a subset of the Response, y, Label dataset used for testing
-    Return
-        X_train_standardize (DataFrame): a standardized subset of the Features, X, Predictors dataset used for training
-        X_test_standardize (DataFrame): a standardized subset of the Features, X, Predictors dataset used for testing
-        y_train_standardize (Series): a standardized subset of the Response, y, Label dataset used for training
-        y_test_standardize (Series): a standardized subset of the Response, y, Label dataset used for testing
-        standardize (dictionary): a dictionary of the mean and standard deviation for un-standardizing data and standardizing incoming data e.g. {mean: {X_train: "", y_train: ""}, std: {X_train: "", y_train: ""}}
-    """
-    # Determine the mean and standard deviation
-    # If pandas Dataframe
-    if isinstance(X_train, pd.DataFrame):
-        X_train_mean = list(X_train.mean())
-        X_train_std = list(X_train.std())
-    # If pandas Series
-    else:
-        X_train_mean = X_train.mean()
-        X_train_std = X_train.std()
-
-    y_train_mean = y_train.mean()
-    y_train_std = y_train.std()
-
-    # Standardize data
-    X_train_standardize = (X_train - X_train_mean) / X_train_std
-    X_test_standardize  = (X_test - X_train_mean) / X_train_std
-    y_train_standardize  = (y_train - y_train_mean) / y_train_std
-    y_test_standardize  = (y_test - y_train_mean) / y_train_std
-
-    # Create a dictionary of the mean and standard deviation for un-standardizing data and standardizing incoming data
-    standardize = dict()
-    standardize["mean"] = dict()
-    standardize["std"] = dict()
-    standardize["mean"]["X_train"] = X_train_mean
-    standardize["std"]["X_train"] = X_train_std
-    standardize["mean"]["y_train"] = y_train_mean
-    standardize["std"]["y_train"] = y_train_std
-
-    return X_train_standardize, X_test_standardize, y_train_standardize, y_test_standardize, standardize
-```
 
 ### Unstandardize Data
 
-Unstandardization allows users to view the results without normalization in the response/y/label scientific units. Below is an example of unstandardizing the data via mean normalization.
+Unstandardization allows users to view the results without normalization in the response/y/label scientific units. The README provides an example of unstandardizing the data via mean normalization.
 
-```Python
-import pandas as pd
+## Deciding to Save/ Don't Save Model
 
-def unstandardize_mean_normalization(y_train, y_test, yhat_train, yhat_test, standardize):
-    """
-    Unstandardizes the data according to the z-score formula
+### Save Model
+Reasons to save the model to a serialize file:
+* Can be used in the future to make a prediction on incoming data
+* The model takes a long time to train
+* Continuous incoming data is received which occurs too quickly to retrain a new model each time
 
-    z = (x * σ) + μ
+The serialized model file will be stored in Deep Lynx.
 
-    Note: Only the training mean and standard deviation are used for the standardization of the data.
-    This ensures that there is no contamination of the test data set.
+If the user chooses to save their model(s) for future use, the user will need to make a `Prediction` Jupyter Notebook that uses a existing model to make a prediction on incoming data. See the user guide in the `prediction` section of the ML Adapter for more information.
 
-    Args
-        y_train (Series): a standardized subset of the Response, y, Label dataset used for training
-        y_test (Series): a standardized subset of the Response, y, Label dataset used for testing
-        yhat_train (Series): a standardized estimation of the Response, y, Label for training set
-        yhat_test (Series): a standardized estimation of the Response, y, Label for testing set
-        standardize (dictionary): a dictionary of the mean and standard deviation for un-standardizing data and standardizing incoming data e.g. {mean: {X_train: "", y_train: ""}, std: {X_train: "", y_train: ""}}
-    Return
-        y_train (Series): an unstandardized subset of the Response, y, Label dataset used for training
-        y_test (Series): an unstandardized subset of the Response, y, Label dataset used for testing
-        yhat_train (Series): an unstandardized estimation of the Response, y, Label for training set
-        yhat_test (Series): a unstandardized estimation of the Response, y, Label for testing set
-        y_train_residuals (Series): the difference between the actual train response and the predicted train response (y_train - yhat_train)
-        y_test_residuals (Series): the difference between the actual test response and the predicted test response (y_test - yhat_test)
+If the user standardizes their data, this information will need to be used in the `prediction` section. The recommendation is to write this information (mean, standard deviation, etc) to a json file and store the information in Deep Lynx along with the serialized model file.
 
-    """   
-    # Unstandardize y and yhat for the training and testing datasets
-    y_train_mean = standardize["mean"]["y_train"]
-    y_train_std = standardize["std"]["y_train"]
+Use case: If your model takes days to train, you can write the model to a serialized file and store the file in Deep Lynx. Deep Lynx is queried for this saved model file and can be used to make a prediction with new data.
 
-    y_train = (y_train * y_train_std) + y_train_mean
-    yhat_train = (yhat_train * y_train_std.values) + y_train_mean.values
-    y_test = (y_test * y_train_std ) + y_train_mean
-    yhat_test = (yhat_test * y_train_std.values) + y_train_mean.values
+### Don't Save Model
+* The model will be out-of-date after receiving a set of new data
+* The model can quickly train on new data
 
-    # Reshape if necessary
-    y_train = y_train.values.reshape(-1)
-    y_test = y_test.values.reshape(-1)
-
-    # Unstandardize residuals for the training and testing datasets
-    y_train_residuals = y_train - yhat_train
-    y_test_residuals = y_test - yhat_test
-
-    return y_train, y_test, yhat_train, yhat_test, y_train_residuals, y_test_residuals
-```
+If the user does not save their model(s), the user should ignore the `prediction` section of the ML Adapter.
