@@ -2,7 +2,7 @@
 The purpose is to generate a `.json` file that contains the relevant information for instantiating numerous machine learning model (`ML_Model`) objects. Samples are provided which include a sample Jupyter Notebook called `sample_variable_selection.ipynb` and a sample output file called `sample.json`.
 
 ## JSON File Format
-The `.json` file should contain an array of json objects for instantiating machine learning model(`ML_Model`) objects. The next section describes the required format of the creating a json object.
+The `.json` file should contain an array of json objects for instantiating machine learning model(`ML_Model`) objects. The next section describes the required format for each json object.
 
 ```
 [

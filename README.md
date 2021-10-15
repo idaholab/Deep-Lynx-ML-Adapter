@@ -4,15 +4,64 @@ The Deep Lynx Machine Learning (ML) Adapter is a generic adapter that programmat
 
 This project is a [Deep Lynx](https://github.com/idaholab/Deep-Lynx) adapter that utilizes the Deep Lynx event system. After this application registers for events, received events will be parsed for data to be used in machine learning processes.
 
+Logs will be written to a logfile, stored in the root directory of the project. The log filename is set in `ml/__init__.py`. 
+
+## Environment Variables
+
 To run this code, first copy the `.env_sample` file and rename it to `.env`. Several parameters must be present:
 * DEEP_LYNX_URL: The base URL at which calls to Deep Lynx should be sent
 * CONTAINER_NAME: The container name within Deep Lynx
 * DATA_SOURCE_NAME: A name for this data source to be registered with Deep Lynx
+* DATA_SOURCES: A list of Deep Lynx data source names which listens for events
+* REGISTER_WAIT_SECONDS: the number of seconds to wait between attempts to register for events 
+* SPLIT: a json of the parameters for each split method. See section below for more details
+* ML_ADAPTER_OBJECTS: a json of information for instantiating a `ML_Adapter` object. See section below for more details
+* ML_ADAPTER_OBJECT_LOCATION: specifies a file that contains the data for the current (single) `ML_Adapter` object from the `ML_ADAPTER_OBJECTS` environment variable
 
+### SPLIT Environment Variable
 
-Logs will be written to a logfile, stored in the root directory of the project. The log filename is set in `ml/__init__.py`.  
+The user should choose the parameters for the following split methods: random, hierarchical clustering, kennard stone (R Jupyter Notebook), sequential, none. 
+
+* `random` - splits the dataset into random training and testing sets
+    * `test_size`: a decimal percentage of the dataset to include in the test set or the absolute number of test samples
+* `hierarchical clustering` - this algorithm build trees in a bottom-up approach, beginning with n singleton clusters (the number of samples in dataset), and then merging the two closest clusters at each stage. This merging is repeated until only one cluster remains.
+    * `N`: the number of samples used in the hierarchical clustering algorithm. Do to performance issues, we recommend maximum N of 1000. The algorithm assigns the other samples to an identified cluster, before splitting into training and testing sets
+    * `max_clusters`: the maximum number of clusters to create
+    * `test_size`: an approximate decimal percentage of the dataset to include in the test set. Absolute number of test samples not supported
+* `kennard stone` - the algorithm takes the pair of samples with the largest Eucledian distance of x-vectors (predictors) and then it sequentially selects a sample to maximize the Eucledian distance between x-vectors of already selected samples and the remaining samples. This process is repeated until the required number of samples is achieved.
+    * `N`: the number of samples used in the kennard stone algorithm. Do to performance issues, we recommend maximum N of 40,000.
+    * `k`: the number of samples to assign to the training set
+* `squential` - splits the dataset sequentially into training and testing sets given a test size. The testing set is composed of the last indices of the dataset at the length of a test size.
+    * `test_size`: the number of samples in the testing set
+        * `N`: the number of samples in the testing set if the rows in the dataset > `N`
+        * `percent`: the percentage of samples in the testing set if the rows in the the dataset <= `N`
+* `none` - does not split the data into training and testing sets. The entire dataset becomes the training set.
+
+Default Split Method Parameters
+```
+SPLIT={"random":{"test_size":0.2}, "hierarchical_clustering":{"N":1000,"max_clusters":10,"test_size":0.2}, "kennard_stone":{"N":10000,"k":6000}, "sequential":{"test_size":{"N":600,"percent":0.1}}, "none":null}
+```
+ 
+### ML_ADAPTER_OBJECTS Environment Variable
+
+The R package `dotenv` does not support multi-line variables. Therefore each environment variable must be on a single line. Therefore, the `ML_ADAPTER_OBJECTS` variable must be on a single line.  
 
 ## Getting Started
+
+<details>
+  <summary>Environment Setup for Python</summary>
+
+* Complete the [Poetry installation](https://python-poetry.org/) 
+* All following commands are run in the root directory of the project:
+    * Run `poetry install` to install the defined dependencies for the project.
+    * Run `poetry shell` to spawns a shell.
+    * Finally, run the project with the command `flask run`
+
+</details>
+
+<details>
+  <summary>Environment Setup for R: using Kennard Stone split method or R Jupyter Notebook</summary>
+
 ### Install Poetry with Anaconda Virtual Environment
 1. Install [Anaconda](https://docs.anaconda.com/anaconda/install/index.html), allows for Python and R virtual environments
 2. Install [Poetry](https://python-poetry.org/), a package manager for dependencies
@@ -76,6 +125,14 @@ Finally, run the project with flask
 ```
 (<MY-ENV-NAME>)$ flask run
 ```
+
+### Environment Variables
+The R package `dotenv` does not support multi-line variables. Therefore each environment variable must be on a single line. Therefore, the `ML_ADAPTER_OBJECTS` variable must be on a single line.  
+
+
+</details>
+
+## Contributing
 
 This project uses [yapf](https://github.com/google/yapf) for formatting. Please install it and apply formatting before submitting changes (e.g. `yapf --in-place --recursive . --style={column_limit:120}`)
 

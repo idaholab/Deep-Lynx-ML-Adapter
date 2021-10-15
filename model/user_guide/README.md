@@ -17,7 +17,7 @@ The Jupyter Notebook may have these components:
 * Create model
 * Make a prediction
 * Un-standardize the data
-* Save model to a serialized file (optional)
+* Save model to a serialized file
 * Generate JSON file of results
 
 
@@ -67,3 +67,45 @@ Use case: If your model takes days to train, you can write the model to a serial
 * The model can quickly train on new data
 
 If the user does not save their model(s), the user should ignore the `prediction` section of the ML Adapter.
+
+## Access to Environment Variables
+
+An environment variable called `ML_ADAPTER_OBJECTS` should be created in the .env file that provides the details for each machine learning adapter (`ML_Adapter`) object. The `ML_ADAPTER_OBJECT_LOCATION` environment variable specifies a file that contains the data for the current `ML_Adapter` object. Below is an example of how to access the data for the current `ML_Adapter` object in a Python or R Jupyter Notebook.
+
+Python
+
+```Python
+with open(os.getenv("ML_ADAPTER_OBJECT_LOCATION"), 'r') as fp:
+    data = json.load(fp)
+```
+R
+
+```r
+library(jsonlite)
+load_dot_env(file = ".env")
+file_path = Sys.getenv("ML_ADAPTER_OBJECT_LOCATION")
+data = fromJSON(txt=file_path)
+```
+
+For model, this information can be used to
+
+* Write the machine learning results to the `output_file` specified in the `MODEL` dictionary
+* Write the model serialization file to the `model_serialization_file` specified in the `MODEL` dictionary
+* Write the standardization information to the `standardization_file` specified in the `MODEL` dictionary
+
+Below shows how to use the `data` variable in Python and R.
+
+Python
+
+```Python
+
+# For writing the output file
+location = data["MODEL"]["output_file"]
+```
+R
+
+```r
+
+# For writing the output file
+location = data$MODEL$output_file
+```
