@@ -44,19 +44,23 @@ class ML_Adapter():
         """
         Generates the the training and testing sets from the dataset
         """
-        # Determine name of split file
-        file = ".".join([type, "ipynb"])
+        if type == "none":
+            dataset = pd.read_csv(self.data["DATASET"])
+            dataset.to_csv("data/training_set.csv")
+        else: 
+            # Determine name of split file
+            file = ".".join([type, "ipynb"])
 
-        # Determine path for .csv file
-        file_path = os.path.abspath(os.path.join("split", file))
-        utils.validate_paths_exist(file_path)
-        utils.validate_extension('.ipynb', file_path)
+            # Determine path for .csv file
+            file_path = os.path.abspath(os.path.join("split", file))
+            utils.validate_paths_exist(file_path)
+            utils.validate_extension('.ipynb', file_path)
 
-        # Run Jupyter Notebook
-        if type == "random" or type == "hierarchical_clustering" or type == "sequential":
-            utils.run_jupyter_notebook(file_path, 'python3')
-        elif type == "kennard_stone":
-            utils.run_jupyter_notebook(file_path, 'ir')
+            # Run Jupyter Notebook
+            if type == "random" or type == "hierarchical_clustering" or type == "sequential":
+                utils.run_jupyter_notebook(file_path, 'python3')
+            elif type == "kennard_stone":
+                utils.run_jupyter_notebook(file_path, 'ir')
 
     def variable_selection(self):
         """
