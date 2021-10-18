@@ -39,13 +39,23 @@ def deep_lynx_import(dl_service: deep_lynx.DeepLynxService, data_file: str):
 
 def create_manual_import(dl_service: deep_lynx.DeepLynxService, payload: list):
     """
-    Creates a manual import using the payload to insert into deep lynx
+    Creates a manual import of the payload to insert into Deep Lynx
     Args
         dl_service (DeepLynxService): deep lynx service object
         payload (list): a list of payloads to import into deep lynx
     """
 
     return dl_service.create_manual_import(dl_service.container_id, dl_service.data_source_id, payload)
+
+
+def upload_file(dl_service: deep_lynx.DeepLynxService, file_paths: list):
+    """
+    Uploads a file into Deep Lynx   
+    Args
+        file_paths (list): An array of strings with locations to each file
+        to be uploaded.
+    """
+    return dl_service.upload_file(dl_service.container_id, dl_service.data_source_id, file_paths)
 
 
 def read_file(data_file: str):

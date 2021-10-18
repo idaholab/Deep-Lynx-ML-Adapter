@@ -47,7 +47,7 @@ class ML_Adapter():
         if type == "none":
             dataset = pd.read_csv(self.data["DATASET"])
             dataset.to_csv("data/training_set.csv")
-        else: 
+        else:
             # Determine name of split file
             file = ".".join([type, "ipynb"])
 
