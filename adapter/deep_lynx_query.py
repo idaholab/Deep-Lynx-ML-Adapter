@@ -1,3 +1,5 @@
+# Copyright 2021, Battelle Energy Alliance, LLC
+
 import os
 import json
 import settings
@@ -28,6 +30,26 @@ def query(dl_service: deep_lynx.DeepLynxService, payload: str):
     """
     data = dl_service.query(dl_service.container_id, payload)
     return data
+
+
+def download_file(dl_service: deep_lynx.DeepLynxService, file_id: str):
+    """
+    Downloads a file from Deep Lynx
+    Args
+        dl_service (DeepLynxService): deep lynx service object
+        file_id (string): the id of a file
+    """
+    return dl_service.download_file(dl_service.container_id, file_id)
+
+
+def retrieve_file(dl_service: deep_lynx.DeepLynxService, file_id: str):
+    """
+    Retrieves a file from Deep Lynx
+    Args
+        dl_service (DeepLynxService): deep lynx service object
+        file_id (string): the id of a file
+    """
+    return dl_service.retrieve_file(dl_service.container_id, file_id)
 
 
 def compile_data(dl_service: deep_lynx.DeepLynxService):

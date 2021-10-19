@@ -1,3 +1,5 @@
+# Copyright 2021, Battelle Energy Alliance, LLC
+
 import os
 import errno
 import logging

@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright 2021, Battelle Energy Alliance, LLC
 
 STATUS=`yapf --diff --recursive . --style={column_limit:120}`
 if [[ ! -z $STATUS ]]; then
