@@ -98,14 +98,12 @@ Below shows how to use the `data` variable in Python and R.
 Python
 
 ```Python
-
 # For writing the output file
 location = data["MODEL"]["output_file"]
 ```
 R
 
 ```r
-
 # For writing the output file
 location = data$MODEL$output_file
 ```
