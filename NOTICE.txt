@@ -1,5 +1,5 @@
 ﻿This project contains code from Idaho National Laboratory's Deep Lynx Project
-Github https://github.com/idaholab/Deep-Lynx-Machine-Learning
+Github https://github.com/idaholab/Deep-Lynx-ML-Adapter
 Licensed under MIT License.
 
 
@@ -31,6 +31,6 @@ PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE WOULD NOT INFRINGE PRIVATELY
 OWNED RIGHTS.
 
 Authors:
-Jeren Browning
 Katherine Wilsdon
 Ross Kunz
+Jeren Browning
