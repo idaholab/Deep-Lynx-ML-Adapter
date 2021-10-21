@@ -42,9 +42,11 @@ class ML_Adapter():
         with open(file_path, 'w') as fp:
             json.dump(self.data, fp)
 
-    def generate_training_testing_sets(self, type):
+    def generate_training_testing_sets(self, type: str):
         """
         Generates the the training and testing sets from the dataset
+        Args
+            type (string): the type of split method e.g. none, random, hierarchical_clustering, kennard_stone, sequential
         """
         if type == "none":
             dataset = pd.read_csv(self.data["DATASET"])

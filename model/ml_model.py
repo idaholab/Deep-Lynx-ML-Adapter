@@ -61,9 +61,16 @@ class ML_Model():
             data = json.load(fp)
         utils.run_jupyter_notebook(data["MODEL"]["notebook"], data["MODEL"]["kernel"])
 
-    def create_training_testing_files(self, X_train, X_test, y_train, y_test):
+    def create_training_testing_files(self, X_train: pd.DataFrame or pd.Series, X_test: pd.DataFrame or pd.Series,
+                                      y_train: pd.DataFrame or pd.Series, y_test: pd.DataFrame or pd.Series):
         """
         Creates .csv files of the predictors/response for the training and testing sets
+        
+        Args
+            X_train (DataFrame or Series): a subset of the Features, X, Predictors dataset used for training
+            X_test (DataFrame or Series): a subset of the Features, X, Predictors dataset used for testing
+            y_train (DataFrame or Series): a subset of the Response, y, Label dataset used for training
+            y_test (DataFrame or Series): a subset of the Response, y, Label dataset used for testing
         """
         # If supervised learning
         if y_train is not None and y_test is not None:
