@@ -8,18 +8,92 @@ Logs will be written to a logfile, stored in the root directory of the project. 
 
 ## Overview of the Deep Lynx Machine Learning Adapter
 
-The Deep Lynx Machine Learning (ML) Adapter is a generic adapter that programmatically runs the machine learning as continuous data is received. Then, Jupyter Notebooks, shown as notebook icons, can be customized according to the project for variable selection, building the machine learning models, and prediction analysis of incoming data using an existing model. User guides were created with each of these customizable sections for the end user. The Jupyter Notebook platform was chosen to allow the end user to pick a kernel in any available language including Python, R, Matlab, Fortran, Perl, C++, Java, and many more. 
-
-The software has three generic classes called the ML Adapter, ML Model, and ML Prediction that pre and post process the data. With the ML Adapter class, the data is split into training and testing sets where the user can choose to split the data via random, hierarchical clustering, Kennard Stone, or sequential methods. Then, a Jupyter Notebook is used to select the independent and dependent variables for creating a model and writes this information to a json file. This file is used to instantiate multiple model and prediction objects.
-
-Next, the ML Model class splits the training and testing sets further into predictors and response and writes the data to these csv files. These files are temporary and are only used in the Jupyter Notebook. The user provides a Jupyter Notebook for creating a machine learning model tailored to their project that produces a model serialization file and a file of the machine learning results. The model file and machine learning results are then imported in Deep Lynx for storage.
-
-Lastly, the ML Prediction class selects the predictors from the incoming data and writes the data to a test csv file. Using the existing model serialization file stored in Deep Lynx, a Jupyter Notebook makes a prediction on the incoming data and writes the results to a file. The machine learning results are imported into Deep Lynx for use in other applications such as the UI and intelligent control of a live asset.  
+The Deep Lynx Machine Learning (ML) Adapter is a generic adapter that receives data from Deep Lynx, programmatically runs the machine learning, and imports the machine learning data into Deep Lynx. Jupyter Notebooks, shown as notebook icons in the below diagram, can be customized according to the project for variable selection, building the machine learning models, and prediction analysis of incoming data using an existing model. User guides were created with each of these customizable sections for the end user. The Jupyter Notebook platform was chosen to allow the end user to pick a kernel in any available language including Python, R, Matlab, Fortran, Perl, C++, Java, and many more.  
+ 
+The software has three generic classes called the ML Adapter, ML Model, and ML Prediction that pre and post process the data. With the ML Adapter class, the data is split into training and testing sets where the user can choose to split the data via random, hierarchical clustering, Kennard Stone, or sequential methods. Then, a Jupyter Notebook is used to select the independent and dependent variables for creating a model and writes this information to a json file. This file is used to instantiate multiple model and prediction objects. 
+ 
+Next, the ML Model class splits the training and testing sets further into predictors and response and writes the data to csv files (X_train, X_test, y_train, y_test). These files are temporary and are only used in the Jupyter Notebook. The user provides a Jupyter Notebook for creating a machine learning model tailored to their project that produces a model serialization file and a file of the machine learning results. The model file and machine learning results are then imported in Deep Lynx for storage. 
+ 
+Lastly, the ML Prediction class selects the predictors from the incoming data and writes the data to a test csv file. Using the existing model serialization file stored in Deep Lynx, a Jupyter Notebook makes a prediction on the incoming data and writes the results to a file. The machine learning results are imported into Deep Lynx for use in other applications such as a UI or intelligent control of a live asset.  
 
 
 ![ML Adapter Architecture](data/ML_Adapter_Architecture.png)
 
-## Environment Variables (.env file)
+## Getting Started
+
+1. Setup your environment. See the `Environment Setup for Python` or `Environment Setup for R` sections.
+2. Look at the README sections in the `variable_selection`, `model`, and `prediction` folders.
+3. Look at the `Environment Variables (.env file)` section.
+4. Create Jupyter Notebooks in directories `variable_selection`, `model`, and `prediction` accordingly.
+5. Setup your `.env` file. 
+5. Run the project.
+
+<details>
+  <summary>Environment Setup for Python</summary>
+
+* Complete the [Poetry installation](https://python-poetry.org/) 
+* All following commands are run in the root directory of the project:
+    * Run `poetry install` to install the defined dependencies for the project.
+    * Run `poetry shell` to spawns a shell.
+    * Finally, run the project with the command `flask run`
+
+</details>
+
+<details>
+  <summary>Environment Setup for R: using Kennard Stone split method or R Jupyter Notebook</summary>
+
+### Install Poetry with Anaconda Virtual Environment
+1. Install [Anaconda](https://docs.anaconda.com/anaconda/install/index.html), allows for Python and R virtual environments
+2. Install [Poetry](https://python-poetry.org/), a package manager for dependencies
+    * All following commands are run in the root directory of the project:
+        * Run `poetry install` to install the defined dependencies for the project.
+        * Run `poetry shell` to spawns a shell.
+        * Finally, run the project with the command `flask run`
+
+### Install R Kernel
+1. Install the R kernel in Jupyter Notebook
+* https://richpauloo.github.io/2018-05-16-Installing-the-R-kernel-in-Jupyter-Lab/
+* https://developers.refinitiv.com/en/article-catalog/article/setup-jupyter-notebook-r
+
+
+2. Verify the `ir` kernel was installed
+
+```
+$ jupyter kernelspec list
+```
+
+3. Start Jupyter Notebook from the root directory of this project. Go to `New` to verify the R kernel was installed
+
+```
+$ jupyter notebook
+```
+### Install R Packages for Kennard Stone Algorithm
+1. Open a new terminal and create an R terminal
+
+```
+$ R
+```  
+2. Install the packages below
+
+```
+# R terminal
+> install.packages('prospectr', dependencies = TRUE)
+> install.packages('reticulate', dependencies = TRUE)
+> install.packages('dotenv', dependencies = TRUE)
+> install.packages('jsonlite', dependencies = TRUE)
+```
+
+### Environment Variables
+The R package `dotenv` does not support multi-line variables. Therefore each environment variable must be on a single line, including the `ML_ADAPTER_OBJECTS` variable.
+
+
+</details>
+
+
+<details>
+  <summary>Environment Variables (.env file)</summary>
+
+### Environment Variables (.env file)
 
 To run this code, first copy the `.env_sample` file and rename it to `.env`. Several parameters must be present:
 * DEEP_LYNX_URL: The base URL at which calls to Deep Lynx should be sent
@@ -104,88 +178,25 @@ Don't Save Model
 }
 ```
 
-## Getting Started
-
-<details>
-  <summary>Environment Setup for Python</summary>
-
-* Complete the [Poetry installation](https://python-poetry.org/) 
-* All following commands are run in the root directory of the project:
-    * Run `poetry install` to install the defined dependencies for the project.
-    * Run `poetry shell` to spawns a shell.
-    * Finally, run the project with the command `flask run`
-
 </details>
 
 <details>
-  <summary>Environment Setup for R: using Kennard Stone split method or R Jupyter Notebook</summary>
+  <summary>Deep Lynx Integration</summary>
 
-### Install Poetry with Anaconda Virtual Environment
-1. Install [Anaconda](https://docs.anaconda.com/anaconda/install/index.html), allows for Python and R virtual environments
-2. Install [Poetry](https://python-poetry.org/), a package manager for dependencies
-3. Configure the Poetry's Virtualenv location
+### Deep Lynx Integration
+The Deep Lynx developer needs to query Deep Lynx for data to use in machine learning and import machine learning data into Deep Lynx.
 
-```
-poetry config settings.virtualenvs.path <CONDA-INSTALL-LOCATION> # e.g. /Users/username/opt/anaconda3
-```
+### Query Data
 
-4. Create and activate virtual env with conda
+The query file is located in `adapter/deep_lynx_query.py`.
 
-```
-$ conda create -n <MY-ENV-NAME> r-essentials r-base python=3.8
-$ conda activate <MY-ENV-NAME>
-(<MY-ENV-NAME>)$
-```
+The developer will need to customize the `compile_data()` function which complies a dataset from deep lynx queries. This function should use the `query()` function to query Deep Lynx for nodes or edges and `download_file()` or `retrieve_file()` functions for querying files.
 
-5. Go to your project directory and install from your pyproject.toml
+### Import Data
 
-```
-(<MY-ENV-NAME>)$ poetry install
-```
-### Install R Kernel
-1. Install the R kernel in Jupyter Notebook
-* https://richpauloo.github.io/2018-05-16-Installing-the-R-kernel-in-Jupyter-Lab/
-* https://developers.refinitiv.com/en/article-catalog/article/setup-jupyter-notebook-r
+The query file is located in `adapter/deep_lynx_import.py`.
 
-
-2. Verify the `ir` kernel was installed
-
-```
-jupyter kernelspec list
-```
-
-3. Start Jupyter Notebook from the root directory of this project. Go to `New` to verify the R kernel was installed
-
-```
-$ conda activate <MY-ENV-NAME>
-(<MY-ENV-NAME>)$ jupyter notebook
-```
-### Install R Packages
-1. Open a new terminal and create an R terminal
-
-```
-$ conda activate <MY-ENV-NAME>
-(<MY-ENV-NAME>)$ R
-```  
-2. Install the packages below
-
-```
-# R terminal
-> install.packages('prospectr', dependencies = TRUE)
-> install.packages('reticulate', dependencies = TRUE)
-> install.packages('dotenv', dependencies = TRUE)
-> install.packages('jsonlite', dependencies = TRUE)
-```
-
-### Run Project
-Finally, run the project with flask
-
-```
-(<MY-ENV-NAME>)$ flask run
-```
-
-### Environment Variables
-The R package `dotenv` does not support multi-line variables. Therefore each environment variable must be on a single line, including the `ML_ADAPTER_OBJECTS` variable.
+The developer will need to customize the `generate_payload()` function which generate a list of payloads to import into deep lynx. This function should use the `create_manual_import()` function to create a manual import of the payload to insert into Deep Lynx and `upload_file()` functions for uploading files.
 
 
 </details>

@@ -42,9 +42,11 @@ class ML_Prediction():
         # Call Jupyter Notebook
         utils.run_jupyter_notebook(data["PREDICTION"]["notebook"], data["PREDICTION"]["kernel"])
 
-    def create_test_file(self, test_data):
+    def create_test_file(self, test_data: pd.DataFrame or pd.Series):
         """
         Creates a test.csv file of the incoming data
+        Args
+            test_data (DataFrame or Series): a subset of the Features, X, Predictors dataset used for testing
         """
         # Validate extension and path existance before creation
         path = 'test.csv'
