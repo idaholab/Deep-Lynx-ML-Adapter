@@ -1,19 +1,19 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
 
 import os
-import json
 import settings
 import pandas as pd
 import deep_lynx
 
 
-def deep_lynx_query(dl_service: deep_lynx.DataQueryApi, data_file: str):
+def deep_lynx_query(dl_service: deep_lynx.DataQueryApi):
     """
     Queries deep lynx for data and writes the dataset to .csv file
     Args
         dl_service (deep_lynx.DataQueryApi): deep lynx query api
-        data_file (str): location of the file to write
     """
+    # Location of the file to write
+    data_file = os.getenv("QUERY_FILE_NAME")
     dataset = compile_data(dl_service)
     write_csv(dataset, data_file)
 

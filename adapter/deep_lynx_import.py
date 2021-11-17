@@ -1,11 +1,6 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
 
 import os
-import json
-from pdb import set_trace
-import settings
-import pandas as pd
-import datetime
 import logging
 import deep_lynx
 from deep_lynx.api_client import ApiClient
@@ -13,7 +8,7 @@ import utils
 
 
 def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi, api_client: ApiClient, container_id: str,
-                     data_source_id: str, data_file: str):
+                     data_source_id: str):
     """
     Imports data into Deep Lynx
     Args
@@ -22,8 +17,8 @@ def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi, api_client: Api
         data_source_id (str): deep lynx data source id
         data_file (string): location of file to read
     """
-    # Read file
-    json_data = read_file(data_file)
+    # Location of file to read
+    data_file = os.getenv("IMPORT_FILE_NAME")
     # Generate a dictionary of payloads to import
     payload = generate_payload(json_data)
     # Check if all payloads are valid
@@ -76,30 +71,12 @@ def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_paths: list, co
         file_returns.append(data_sources_api.upload_file(container_id, data_source_id, file))
     return file_returns
 
-
-def read_file(data_file: str):
-    """
-    Reads files for import
-    
-    Args
-        data_file (string): the path to a json file
-    Return
-        json_data (dictionary): a dictionary of the data to import
-    """
-    utils.validate_extension('.json', data_file)
-    utils.validate_paths_exist(data_file)
-
-    with open(data_file, "r") as f:
-        json_data = json.load(f)
-    return json_data
-
-
-def generate_payload(json_data: dict):
+def generate_payload(data_file):
     """
     Generate a list of payloads to import into deep lynx
     
     Args
-        json_data (dictionary): a dictionary of results generated from the Jupyter Notebook
+        data_file (string): location of file to read
     Return
         payload (dictionary): a dictionary of payloads to import into deep lynx e.g. {metatype: list(payload)}
     """
