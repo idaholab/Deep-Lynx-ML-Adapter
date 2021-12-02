@@ -8,10 +8,14 @@ import pandas as pd
 import datetime
 import logging
 import deep_lynx
+from deep_lynx.api_client import ApiClient
 import utils
 
 
-def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi, container_id: str, data_source_id: str,
+def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi,
+                     api_client: ApiClient,
+                     container_id: str,
+                     data_source_id: str,
                      data_file: str):
     """
     Imports data into Deep Lynx
@@ -26,14 +30,14 @@ def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi, container_id: s
     # Generate a dictionary of payloads to import
     payload = generate_payload(json_data)
     # Check if all payloads are valid
-    is_valid = validate_payload(data_sources_api, payload, container_id)
+    is_valid = validate_payload(api_client, payload, container_id)
     if is_valid:
         # Convert dictionary to list of payloads
         payload_list = list()
         for key in payload.keys():
             payload_list.extend(payload[key])
         # Manually import the data
-        info = create_manual_import(data_sources_api, payload_list)
+        info = create_manual_import(data_sources_api, payload_list, container_id, data_source_id)
         if info['isError'] == False:
             logging.info("Successfully imported data to deep lynx")
             print("Successfully imported data to deep lynx")
