@@ -70,6 +70,7 @@ def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_paths: list, co
         file_returns.append(data_sources_api.upload_file(container_id, data_source_id, file))
     return file_returns
 
+
 def generate_payload(data_file):
     """
     Generate a list of payloads to import into deep lynx

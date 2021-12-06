@@ -45,7 +45,6 @@ def create_app():
     env.int("IMPORT_FILE_WAIT_SECONDS")
     env.int("REGISTER_WAIT_SECONDS")
 
-
     # Purpose to run flask once (not twice)
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         # Instantiate deep_lynx
@@ -164,6 +163,7 @@ def register_for_event(container_id: str, api_client: deep_lynx.ApiClient, itera
 
     return registered
 
+
 def query_deep_lynx(dl_service: deep_lynx.DeepLynxService = None):
     """
     Query Deep Lynx for data
@@ -204,6 +204,7 @@ def query_deep_lynx(dl_service: deep_lynx.DeepLynxService = None):
     if did_succeed:
         return True
     return False
+
 
 def import_to_deep_lynx(dl_service: deep_lynx.DeepLynxService = None, event: dict = None):
     """
