@@ -7,8 +7,7 @@ from deep_lynx.api_client import ApiClient
 import utils
 
 
-def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi, api_client: ApiClient, container_id: str,
-                     data_source_id: str):
+def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi, api_client: ApiClient, container_id: str):
     """
     Imports data into Deep Lynx
     Args
