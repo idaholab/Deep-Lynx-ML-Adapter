@@ -1,21 +1,22 @@
 [tool.poetry]
 name = "ml-adapter"
-version = "0.0.1"
+version = "0.0.2"
 description = "The Deep Lynx Machine Learning (ML) Adapter is a generic adapter that receives data from Deep Lynx, programmatically runs the machine learning, and imports the machine learning data into Deep Lynx."
 authors = ["Katherine Wilsdon <katherine.wilsdon@inl.gov>", "Ross Kunz <rosskunz@gmail.com>", "Jeren Browning <jeren.browning@inl.gov>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 flask = "*"
 requests = "*"
 python-dotenv = "*"
 deep-lynx = "*"
-pandas = "^1.3.3"
-nbformat = "^5.1.3"
-nbconvert = "^6.2.0"
-jupyter = "^1.0.0"
-notebook = "^6.4.4"
-scikit-learn = "^1.0"
+pandas = "*"
+nbformat = "*"
+nbconvert = "*"
+jupyter = "*"
+notebook = "*"
+scikit-learn = "*"
+environs = "*"
 
 [tool.poetry.dev-dependencies]
 

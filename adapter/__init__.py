@@ -5,12 +5,13 @@ import logging
 import json
 import time
 import datetime
+import environs
 from flask import Flask, request, Response, json
-
 import deep_lynx
+
+import utils
 from adapter import ml_adapter
-from adapter.deep_lynx_query import deep_lynx_query
-from adapter.deep_lynx_query import deep_lynx_init
+from adapter.deep_lynx_query import deep_lynx_query, deep_lynx_init
 from adapter.deep_lynx_import import deep_lynx_import
 
 # configure logging. to overwrite the log file for each run, add option: filemode='w'
@@ -27,38 +28,32 @@ def create_app():
     """ This file and aplication is the entry point for the `flask run` command """
     app = Flask(os.getenv('FLASK_APP'), instance_relative_config=True)
 
-    existEnvFile = False
-    deepLynxUrl = False
-    containerName = False
-    dataSourceName = False
+    # Validate .env file exists
+    utils.validate_paths_exist(".env")
 
-    if os.path.isfile('.env'):
-        existEnvFile = True
-    else:
-        logging.error('Fail: Create .env file using .env_sample as a guide.')
-
-    if os.getenv('DEEP_LYNX_URL') is not None:
-        deepLynxUrl = True
-    else:
-        logging.error('Fail: Provide an "DEEP_LYNX_URL" variable in the .env file')
-
-    if os.getenv('CONTAINER_NAME') is not None:
-        containerName = True
-    else:
-        logging.error('Fail: Provide an "CONTAINER_NAME" variable in the .env file')
-
-    if os.getenv('DATA_SOURCE_NAME') is not None:
-        dataSourceName = True
-    else:
-        logging.error('Fail: Provide an "DATA_SOURCE_NAME" variable in the .env file')
+    # Check required variables in the .env file, and raise error if not set
+    env = environs.Env()
+    env.read_env()
+    env.url("DEEP_LYNX_URL")
+    env.str("CONTAINER_NAME")
+    env.str("DATA_SOURCE_NAME")
+    env.list("DATA_SOURCES")
+    env.list("ML_ADAPTER_OBJECTS")
+    env.path("QUERY_FILE_NAME")
+    env.path("IMPORT_FILE_NAME")
+    env.int("QUERY_FILE_WAIT_SECONDS")
+    env.int("IMPORT_FILE_WAIT_SECONDS")
+    env.int("REGISTER_WAIT_SECONDS")
+    env.path("ML_ADAPTER_OBJECT_LOCATION")
+    split = json.loads(os.getenv("SPLIT"))
+    if not isinstance(split, dict):
+        error = "must be dict, not {0}".format(type(split))
+        raise TypeError(error)
 
     # Purpose to run flask once (not twice)
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        if existEnvFile and deepLynxUrl and containerName and dataSourceName:
-            # Instantiate deep_lynx
-            container_id, data_source_id, api_client = deep_lynx_init()
-        else:
-            print('Setup Error: Check logging file MLAdapter.log for more information')
+        # Instantiate deep_lynx
+        container_id, data_source_id, api_client = deep_lynx_init()
 
     @app.route('/events', methods=['POST'])
     def events():
@@ -71,7 +66,6 @@ def create_app():
             imports_api = deep_lynx.ImportsApi(api_client)
             import_data = imports_api.list_imports_data(container_id, data['import_id'])
 
-            # parse event data and run dt_driver main
             # check for event object type
             try:
                 dl_event = import_data['value'][0]['data']
@@ -92,8 +86,6 @@ def create_app():
 
                         ml_data = event_data['value'][0]['data']
 
-                        # TODO: ensure incoming objects are of the format {node, parameter, value}
-
                         # update event object and return to Deep Lynx
                         dl_event['status'] = 'in progress'
                         dl_event['received'] = True
@@ -102,6 +94,9 @@ def create_app():
 
                         datasource_api = deep_lynx.DataSourcesApi(api_client)
                         datasource_api.create_manual_import(dl_event, container_id, data_source_id)
+
+                        # TODO 1. Compile all events into an array of json objects called dl_event_data
+                        # TODO 2. Create function that initiates ML_Adapter objects and save objects for later events to use
 
                         return Response(response=json.dumps(dl_event), status=200, mimetype='application/json')
 
@@ -171,3 +166,106 @@ def register_for_event(container_id: str, api_client: deep_lynx.ApiClient, itera
         iterations -= 1
 
     return registered
+
+
+def queryDeepLynx(api_client: deep_lynx.ApiClient = None, dl_events: list = None):
+    """
+    Query Deep Lynx for data
+    Args
+        api_client (ApiClient): deep lynx api client
+        dl_event (list): a list of json objects from a deep lynx event
+    Return
+        True: if query file is found
+        False: query file is not found
+    """
+    done = False
+    didSucceed = False
+    start = time.time()
+
+    data_query_api = None
+    if api_client is not None:
+        data_query_api = deep_lynx.DataQueryApi(api_client)
+
+    deep_lynx_query(data_query_api, dl_events)
+    path = os.path.join(os.getcwd() + '/' + os.getenv('QUERY_FILE_NAME'))
+    while not done:
+        # Check if query file exists
+        if os.path.exists(path):
+            logging.info(f'Found {os.getenv("QUERY_FILE_NAME")}.')
+            done = True
+            did_succeed = True
+            break
+        else:
+            logging.info(
+                f'Fail: {os.getenv("QUERY_FILE_NAME")} not found. Trying again in {os.getenv("QUERY_FILE_WAIT_SECONDS")} seconds'
+            )
+            end = time.time()
+            # Break out of infinite loop
+            if end - start > float(os.getenv("QUERY_FILE_WAIT_SECONDS")) * 20:
+                logging.info(f'Fail: In the final attempt, {os.getenv("QUERY_FILE_NAME")} was not found.')
+                done = True
+                break
+            # Sleep for wait seconds
+            else:
+                logging.info(
+                    f'Fail: {os.getenv("QUERY_FILE_NAME")} was not found. Trying again in {os.getenv("QUERY_FILE_WAIT_SECONDS")} seconds'
+                )
+                time.sleep(int(os.getenv("QUERY_FILE_WAIT_SECONDS")))
+    if did_succeed:
+        return True
+    return False
+
+
+def importToDeepLynx(api_client: deep_lynx.ApiClient = None,
+                     container_id: str = '',
+                     data_source_id: str = '',
+                     event: dict = None):
+    """
+    Imports the results into Deep Lynx
+    Args
+        api_client (ApiClient): deep lynx api client
+        container_id (str): deep lynx container id
+        data_source_id (str): deep lynx data source id
+        event (dictionary): a dictionary of the event information
+    """
+    done = False
+    didSucceed = False
+    start = time.time()
+    path = os.path.join(os.getcwd() + '/' + os.getenv('IMPORT_FILE_NAME'))
+    while not done:
+        # Check if query file exists
+        if os.path.exists(path):
+            logging.info(f'Found {os.getenv("IMPORT_FILE_NAME")}.')
+            # Import data into Deep Lynx
+            data_sources_api = deep_lynx.DataSourcesApi(api_client)
+            deep_lynx_import(data_sources_api, api_client, container_id, data_source_id)
+            logging.info('Success: Run complete. Output data sent.')
+
+            if event:
+                # Send event signaling ML is done
+                event['status'] = 'complete'
+                event['modifiedDate'] = datetime.datetime.now().isoformat()
+                data_sources_api.create_manual_import(event, container_id, data_source_id)
+                logging.info('Event sent.')
+            done = True
+            didSucceed = True
+            break
+        else:
+            logging.info(
+                f'Fail: {os.getenv("IMPORT_FILE_NAME")} not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds'
+            )
+            end = time.time()
+            # Break out of infinite loop
+            if end - start > float(os.getenv("IMPORT_FILE_WAIT_SECONDS")) * 20:
+                logging.info(f'Fail: In the final attempt, {os.getenv("IMPORT_FILE_NAME")} was not found.')
+                done = True
+                break
+            # Sleep for wait seconds
+            else:
+                logging.info(
+                    f'Fail: {os.getenv("IMPORT_FILE_NAME")} was not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds'
+                )
+                time.sleep(int(os.getenv("IMPORT_FILE_WAIT_SECONDS")))
+    if didSucceed:
+        return True
+    return False

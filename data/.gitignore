@@ -4,3 +4,5 @@
 # Except this file
 !.gitignore
 !ML_Adapter_Architecture.png
+!example/
+!example/*
