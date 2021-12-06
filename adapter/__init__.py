@@ -14,7 +14,6 @@ from adapter import ml_adapter
 from adapter.deep_lynx_query import deep_lynx_query, deep_lynx_init
 from adapter.deep_lynx_import import deep_lynx_import
 
-
 # configure logging. to overwrite the log file for each run, add option: filemode='w'
 logging.basicConfig(filename='MLAdapter.log',
                     level=logging.INFO,
@@ -50,7 +49,6 @@ def create_app():
     if not isinstance(split, dict):
         error = "must be dict, not {0}".format(type(split))
         raise TypeError(error)
-
 
     # Purpose to run flask once (not twice)
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
@@ -108,8 +106,7 @@ def create_app():
 
     # disable running the code twice upon start in development
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        #register_for_event(container_id, api_client)
-        print("")
+        register_for_event(container_id, api_client)
 
     return app
 

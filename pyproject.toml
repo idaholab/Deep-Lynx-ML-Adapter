@@ -5,7 +5,7 @@ description = "The Deep Lynx Machine Learning (ML) Adapter is a generic adapter 
 authors = ["Katherine Wilsdon <katherine.wilsdon@inl.gov>", "Ross Kunz <rosskunz@gmail.com>", "Jeren Browning <jeren.browning@inl.gov>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 flask = "*"
 requests = "*"
 python-dotenv = "*"
