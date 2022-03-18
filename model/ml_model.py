@@ -57,9 +57,22 @@ class ML_Model():
         self.create_training_testing_files(X_train, X_test, y_train, y_test)
 
         # Run the Jupyter Notebook
+        print("Begin forecasting notebook")
         with open(os.getenv("ML_ADAPTER_OBJECT_LOCATION"), 'r') as fp:
             data = json.load(fp)
         utils.run_jupyter_notebook(data["MODEL"]["notebook"], data["MODEL"]["kernel"])
+
+        # File clean up
+        if os.path.exists("data/X_train.csv"):
+            os.remove("data/X_train.csv")
+        if os.path.exists("data/X_test.csv"):
+            os.remove("data/X_test.csv")
+        if os.path.exists("data/y_train.csv"):
+            os.remove("data/y_train.csv")
+        if os.path.exists("data/y_test.csv"):
+            os.remove("data/y_test.csv")
+        if os.path.exists(data["VARIABLE_SELECTION"]["output_file"]):
+            os.remove(data["VARIABLE_SELECTION"]["output_file"])
 
     def create_training_testing_files(self, X_train: pd.DataFrame or pd.Series, X_test: pd.DataFrame or pd.Series,
                                       y_train: pd.DataFrame or pd.Series, y_test: pd.DataFrame or pd.Series):
