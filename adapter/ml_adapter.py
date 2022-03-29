@@ -129,14 +129,11 @@ def main():
     """
     Main entry point for script
     """
-    done = False
-    while not done:
-        adapter.env.read_env()
-        new_data_bool = adapter.env.bool("NEW_DATA")
-        if os.path.exists(os.getenv("QUEUE_FILE_NAME")) and new_data_bool:
+    while True:
+        if os.path.exists(os.getenv("QUEUE_FILE_NAME")) and adapter.new_data:
             # Apply a lock
             with adapter.lock_:
-                os.environ["NEW_DATA"] = 'false'
+                adapter.new_data = False
                 # Read master queue file
                 queue_df = pd.read_csv(os.getenv("QUEUE_FILE_NAME"))
             # Only execute if queue reaches optimal length

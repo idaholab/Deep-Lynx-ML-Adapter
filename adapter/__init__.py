@@ -22,6 +22,7 @@ lock_ = threading.Lock()
 threads = list()
 number_of_events = 1
 env = environs.Env()
+new_data = False
 
 # configure logging. to overwrite the log file for each run, add option: filemode='w'
 logging.basicConfig(filename='MLAdapter.log',
@@ -57,7 +58,6 @@ def create_app():
     env.path("METADATA")
     env.path("QUEUE_FILE_NAME")
     env.int("QUEUE_LENGTH")
-    env.bool("NEW_DATA")
     env.list("ML_ADAPTER_OBJECTS")
 
     split = json.loads(os.getenv("SPLIT"))
@@ -88,19 +88,18 @@ def create_app():
         if os.path.exists(os.getenv("QUEUE_FILE_NAME")):
             os.remove(os.getenv("QUEUE_FILE_NAME"))
         if os.path.exists(os.getenv("ML_ADAPTER_OBJECT_LOCATION")):
+            f = open(os.getenv("ML_ADAPTER_OBJECT_LOCATION"))
+            ml_adapter_object = json.load(f)
+            f.close()
+            if os.path.exists(ml_adapter_object["MODEL"]["output_file"]):
+                os.remove(ml_adapter_object["MODEL"]["output_file"])
+            if os.path.exists(ml_adapter_object["DATASET"]):
+                os.remove(ml_adapter_object["DATASET"])
             os.remove(os.getenv("ML_ADAPTER_OBJECT_LOCATION"))
         if os.path.exists("data/training_set.csv"):
             os.remove("data/training_set.csv")
         if os.path.exists("data/testing_set.csv"):
             os.remove("data/testing_set.csv")
-        ml_adapter_objects = json.loads(os.getenv("ML_ADAPTER_OBJECTS"))
-        for ml_adapter in ml_adapter_objects:
-            name = list(ml_adapter.keys())[0]
-            data = ml_adapter[name]
-            if os.path.exists(data["MODEL"]["output_file"]):
-                os.remove(data["MODEL"]["output_file"])
-            if os.path.exists(data["DATASET"]):
-                os.remove(data["DATASET"])
         if os.path.exists("data/X_train.csv"):
             os.remove("data/X_train.csv")
         if os.path.exists("data/X_test.csv"):
@@ -109,7 +108,6 @@ def create_app():
             os.remove("data/y_train.csv")
         if os.path.exists("data/y_test.csv"):
             os.remove("data/y_test.csv")
-
 
     @app.route('/machinelearning', methods=['POST'])
     def events():
@@ -137,7 +135,7 @@ def create_app():
             # Join: Wait until the thread terminates. This blocks the calling thread until the thread whose join() method is called terminates.
             event_thread.join()
             with lock_:
-                os.environ["NEW_DATA"] = 'true'
+                new_data = True
             print(name, " is done")
             
             return Response(response=json.dumps({'received': True}), status=200, mimetype='application/json')
@@ -150,7 +148,13 @@ def create_app():
 
 
 def register_for_event(api_client: deep_lynx.ApiClient, iterations=30):
-    """ Register with Deep Lynx to receive data_ingested events on applicable data sources """
+    """
+    Register with Deep Lynx to receive data_ingested events on applicable data sources
+    
+    Args
+        api_client (deep_lynx.ApiClient): deep lynx api client
+        iterations (integer): the number of interations to try registering for events
+    """
     registered = False
 
     # List of adapters to receive events from
@@ -229,14 +233,24 @@ def deep_lynx_init():
     configuration.host = os.getenv('DEEP_LYNX_URL')
     api_client = deep_lynx.ApiClient(configuration)
 
-    # authenticate via an API key and secret
-    """auth_api = deep_lynx.AuthenticationApi(api_client)
-    token = auth_api.retrieve_o_auth_token(x_api_key=os.getenv('DEEP_LYNX_API_KEY'),
-                                           x_api_secret=os.getenv('DEEP_LYNX_API_SECRET'),
-                                           x_api_expiry='12h')"""
+    
+    # perform API token authentication only if values are provided
+    if os.getenv('DEEP_LYNX_API_KEY') != '' and os.getenv('DEEP_LYNX_API_KEY') is not None:
 
-    # update header
-    #api_client.set_default_header('Authorization', 'Bearer {}'.format(token))
+        # authenticate via an API key and secret
+        auth_api = deep_lynx.AuthenticationApi(api_client)
+
+        try:
+            token = auth_api.retrieve_o_auth_token(x_api_key=os.getenv('DEEP_LYNX_API_KEY'),
+                                                   x_api_secret=os.getenv('DEEP_LYNX_API_SECRET'),
+                                                   x_api_expiry='12h')
+        except TypeError:
+            print("ERROR: Cannot connect to DeepLynx.")
+            logging.error("Cannot connect to DeepLynx.")
+            return '', '', None
+
+        # update header
+        api_client.set_default_header('Authorization', 'Bearer {}'.format(token))
 
     # get container ID
     container_id = None
