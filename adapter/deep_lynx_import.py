@@ -6,17 +6,15 @@ import os
 import logging
 import deep_lynx
 import json
-import datetime
 import time
 import adapter
 
 
-def import_to_deep_lynx(import_file: str, event: dict = None):
+def import_to_deep_lynx(import_file: str):
     """
     Import data into Deep Lynx
     Args
         import_file (string): the file path to import into Deep Lynx
-        event (dictionary): a dictionary of the event information
     """
     # Get deep lynx environment variables
     api_client = adapter.api_client
@@ -35,13 +33,6 @@ def import_to_deep_lynx(import_file: str, event: dict = None):
             data_sources_api = deep_lynx.DataSourcesApi(api_client)
             info = upload_file(data_sources_api, import_file)
             logging.info('Success: Run complete. Output data sent.')
-
-            if event:
-                # Send event signaling ML is done
-                event['status'] = 'complete'
-                event['modifiedDate'] = datetime.datetime.now().isoformat()
-                #data_sources_api.create_manual_import(event, container_id, data_source_id)
-                logging.info('Event sent.')
             done = True
             did_succeed = True
             break

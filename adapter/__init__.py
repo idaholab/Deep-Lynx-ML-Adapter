@@ -113,36 +113,34 @@ def create_app():
     def events():
         global number_of_events
         if 'application/json' not in request.content_type:
-            logging.warning('Received /events request with unsupported content type')
+            logging.warning('Received request with unsupported content type')
             return Response('Unsupported Content Type. Please use application/json', status=400)
 
         # Data from graph has been received
         data = request.get_json()
-        print(data)
-        file_id = data["query"]["fileID"]
-        logging.info('Received event with data: ' + json.dumps(data))
-
         try:
-            # Retrieves file from Deep Lynx
-            name = "event_thread_" + str(number_of_events)
-            # Thread object: activity that is run in a separate thread of control
-            event_thread = threading.Thread(target=query_deep_lynx, args=(file_id, ), name=name)
-            print("Created ", name)
-            threads.append(event_thread)
-            number_of_events += 1
-            # Start the thread’s activity
-            event_thread.start()
-            # Join: Wait until the thread terminates. This blocks the calling thread until the thread whose join() method is called terminates.
-            event_thread.join()
-            with lock_:
-                new_data = True
-            print(name, " is done")
-            
-            return Response(response=json.dumps({'received': True}), status=200, mimetype='application/json')
-
+            file_id = data["query"]["fileID"]
+            logging.info('Received event with data: ' + json.dumps(data))
         except KeyError:
             # The incoming payload doesn't have what we need, but still return a 200
             return Response(response=json.dumps({'received': True}), status=200, mimetype='application/json')
+
+        # Retrieves file from Deep Lynx
+        name = "event_thread_" + str(number_of_events)
+        # Thread object: activity that is run in a separate thread of control
+        event_thread = threading.Thread(target=query_deep_lynx, args=(file_id, ), name=name)
+        print("Created ", name)
+        threads.append(event_thread)
+        number_of_events += 1
+        # Start the thread’s activity
+        event_thread.start()
+        # Join: Wait until the thread terminates. This blocks the calling thread until the thread whose join() method is called terminates.
+        event_thread.join()
+        with lock_:
+            new_data = True
+        print(name, " is done")
+        
+        return Response(response=json.dumps({'received': True}), status=200, mimetype='application/json')
 
     return app
 
