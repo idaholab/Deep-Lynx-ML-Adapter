@@ -55,6 +55,7 @@ def import_to_deep_lynx(import_file: str):
         return True
     return False
 
+
 def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_path: str):
     """
     Uploads a file into Deep Lynx   
@@ -82,8 +83,7 @@ def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_path: str):
     return file_return
 
 
-def create_manual_import(data_sources_api: deep_lynx.DataSourcesApi = None,
-                         payload: list = None):
+def create_manual_import(data_sources_api: deep_lynx.DataSourcesApi = None, payload: list = None):
     """
     Creates a manual import of the payload to insert into Deep Lynx
     Args

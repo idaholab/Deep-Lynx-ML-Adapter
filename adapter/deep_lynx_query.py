@@ -7,8 +7,9 @@ import deep_lynx
 import adapter
 import pandas as pd
 
-# Repository Modules 
+# Repository Modules
 import settings
+
 
 def query_deep_lynx(file_id: str):
     """

@@ -10,7 +10,7 @@ from flask import Flask, request, Response, json
 import deep_lynx
 import threading
 
-# Repository Modules 
+# Repository Modules
 from .deep_lynx_query import query_deep_lynx
 from .deep_lynx_import import import_to_deep_lynx
 from .ml_adapter import main
@@ -77,7 +77,7 @@ def create_app():
 
         # Create Thread object that runs the machine learning algorithms
         # Thread object: activity that is run in a separate thread of control
-        # Daemon: a process that runs in the background. A daemon thread will shut down immediately when the program exits. 
+        # Daemon: a process that runs in the background. A daemon thread will shut down immediately when the program exits.
         ml_thread = threading.Thread(target=main, daemon=True, name="ml_thread")
         print("Created ml_thread")
         threads.append(ml_thread)
@@ -139,7 +139,7 @@ def create_app():
         with lock_:
             new_data = True
         print(name, " is done")
-        
+
         return Response(response=json.dumps({'received': True}), status=200, mimetype='application/json')
 
     return app
@@ -176,8 +176,8 @@ def register_for_event(api_client: deep_lynx.ApiClient, iterations=30):
                     # by comparing to the established event action we would like to create
 
                     event_action = deep_lynx.CreateEventActionRequest(
-                        data_source.container_id, data_source.id, "file_created", "send_data", None,
-                        "http://" + os.getenv('FLASK_RUN_HOST') + ":" + os.getenv('FLASK_RUN_PORT') + "/machinelearning",
+                        data_source.container_id, data_source.id, "file_created", "send_data", None, "http://" +
+                        os.getenv('FLASK_RUN_HOST') + ":" + os.getenv('FLASK_RUN_PORT') + "/machinelearning",
                         os.getenv("DATA_SOURCE_ID"), True)
 
                     actions = events_api.list_event_actions()
@@ -216,6 +216,7 @@ def register_for_event(api_client: deep_lynx.ApiClient, iterations=30):
 
     return registered
 
+
 def deep_lynx_init():
     """ 
     Returns the container id, data source id, and api client for use with the DeepLynx SDK.
@@ -231,7 +232,6 @@ def deep_lynx_init():
     configuration.host = os.getenv('DEEP_LYNX_URL')
     api_client = deep_lynx.ApiClient(configuration)
 
-    
     # perform API token authentication only if values are provided
     if os.getenv('DEEP_LYNX_API_KEY') != '' and os.getenv('DEEP_LYNX_API_KEY') is not None:
 

@@ -6,7 +6,7 @@ import json
 import pandas as pd
 import time
 
-# Repository Modules 
+# Repository Modules
 import utils
 import model
 import settings
@@ -140,7 +140,7 @@ def main():
             if queue_df.shape[0] == int(os.getenv("QUEUE_LENGTH")):
                 # TODO: Change to customized name
                 file_name = None
-                
+
                 # File paths for local files
                 query_file_name = "data/" + file_name
                 import_file_name = "data/ML_" + file_name
