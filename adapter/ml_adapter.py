@@ -138,11 +138,9 @@ def main():
                 queue_df = pd.read_csv(os.getenv("QUEUE_FILE_NAME"))
             # Only execute if queue reaches optimal length
             if queue_df.shape[0] == int(os.getenv("QUEUE_LENGTH")):
-                # Create file name
-                initial_time = int(queue_df.iloc[0][0])
-                final_time = int(queue_df.iloc[queue_df.shape[0] - 1][0])
-                file_name = os.getenv("CONTAINER_NAME") + "_" + str(initial_time) + "_" + str(final_time) + ".csv"
-
+                # TODO: Change to customized name
+                file_name = None
+                
                 # File paths for local files
                 query_file_name = "data/" + file_name
                 import_file_name = "data/ML_" + file_name
