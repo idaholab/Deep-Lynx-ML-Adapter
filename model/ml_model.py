@@ -20,6 +20,7 @@ class ML_Model():
         Generates a machine learning serialized model and ML results
 
     """
+
     def __init__(self, independent_variables, dependent_variables):
         self.independent_variables = independent_variables
         self.dependent_variables = dependent_variables

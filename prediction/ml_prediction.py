@@ -17,6 +17,7 @@ class ML_Prediction():
         2. Write the test file 
         3. Run the customized prediction Jupyter Notebook
     """
+
     def __init__(self, ml_model):
         # Declare variables
         self.ml_model = ml_model

@@ -10,6 +10,7 @@ import time
 import utils
 import model
 import settings
+
 api_client = None
 
 import adapter
@@ -22,6 +23,7 @@ class ML_Adapter():
         2. Perform variable selection to determine the independent and dependent variables
         3. Create ML_Model objects with different independent and dependent variables
     """
+
     def __init__(self, name, data):
         self.name = name
         self.data = data
