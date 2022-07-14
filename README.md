@@ -26,7 +26,7 @@ Lastly, the ML Prediction class selects the predictors from the incoming data an
 5. Setup your `.env` file. 
 5. Run the project.
 
-Logs will be written to a logfile, stored in the root directory of the project. The log filename is set in `adapter/__init__.py` and is called `MLAdapter.log`.
+Logs will be written to a log file, stored in the root directory of the project. The log filename is set in `adapter/__init__.py` and is called `MLAdapter.log`.
 
 <details>
   <summary>Environment Setup for Python</summary>
