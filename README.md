@@ -2,9 +2,7 @@
 
 The Deep Lynx Machine Learning (ML) Adapter is a generic adapter that receives data from Deep Lynx, programmatically runs the machine learning, and imports the machine learning data into [Deep Lynx](https://github.com/idaholab/Deep-Lynx). Then, Jupyter Notebooks can be customized according to the project for building the machine learning models and performing prediction analysis of incoming data using an existing model.
 
-This project is a [Deep Lynx](https://github.com/idaholab/Deep-Lynx) adapter that utilizes the Deep Lynx event system. After this application registers for events, received events will be parsed for data to be used in machine learning processes.
-
-Logs will be written to a logfile, stored in the root directory of the project. The log filename is set in `adapter/__init__.py` and is called `MLAdapter.log`. 
+This project is a [Deep Lynx](https://github.com/idaholab/Deep-Lynx) adapter that utilizes the Deep Lynx event system. After this application registers for events, received events will be parsed for data to be used in machine learning processes. 
 
 ## Overview of the Deep Lynx Machine Learning Adapter
 
@@ -28,12 +26,14 @@ Lastly, the ML Prediction class selects the predictors from the incoming data an
 5. Setup your `.env` file. 
 5. Run the project.
 
+Logs will be written to a logfile, stored in the root directory of the project. The log filename is set in `adapter/__init__.py` and is called `MLAdapter.log`.
+
 <details>
   <summary>Environment Setup for Python</summary>
 
 * Complete the [Poetry installation](https://python-poetry.org/) 
 * All following commands are run in the root directory of the project:
-    * Run `poetry install` to install the defined dependencies for the project.
+    * Run `poetry update` to install the defined dependencies for the project.
     * Run `poetry shell` to spawns a shell.
     * Finally, run the project with the command `flask run`
 
@@ -203,7 +203,9 @@ The developer will need to customize the `generate_payload()` function which gen
 
 ## Contributing
 
-This project uses [yapf](https://github.com/google/yapf) for formatting. Please install it and apply formatting before submitting changes (e.g. `yapf --in-place --recursive . --style={column_limit:120}`)
+This project uses [yapf](https://github.com/google/yapf) for formatting. Please install it and apply formatting before submitting changes.
+1. `poetry shell`
+2. `yapf --in-place --recursive . --style={column_limit:120}`)
 
 ### Other Software
 Idaho National Laboratory is a cutting edge research facility which is a constantly producing high quality research and software. Feel free to take a look at our other software and scientific offerings at:
@@ -214,7 +216,7 @@ Idaho National Laboratory is a cutting edge research facility which is a constan
 
 [Raw Experiment Open Source Software](https://github.com/IdahoLabResearch)
 
-[Unsupported Open Source Software](https://github.com/IdahoLabCuttingBoard)
+[Unsupported Open Source Software](https://github.com/IdahoLabUnsupported)
 
 ### License
 
